@@ -16,10 +16,26 @@ const dmMono = DM_Mono({
   weight: ["400", "500"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Real-Time Industrial Anomaly Monitor",
   description:
     "Production-style SECOM semiconductor anomaly monitoring dashboard with simulated IoT streaming and autoencoder inference.",
+  openGraph: {
+    title: "Real-Time Industrial Anomaly Monitor",
+    description:
+      "SECOM replay · live anomaly scoring · FastAPI autoencoder on Hugging Face.",
+    images: ["/brand/og.svg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Real-Time Industrial Anomaly Monitor",
+    images: ["/brand/og.svg"],
+  },
 };
 
 const themeInitScript = `

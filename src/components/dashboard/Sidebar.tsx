@@ -1,7 +1,8 @@
 "use client";
 
-import { AudioWaveform, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 
+import { BrandMark } from "@/components/brand/brand-mark";
 import { NAV_ITEMS } from "@/lib/dashboard-nav";
 import { shellLayout } from "@/lib/dashboard-layout";
 import {
@@ -37,7 +38,7 @@ export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
           onClick={() => onNavigate("dashboard")}
           className="flex size-9 items-center justify-center text-text-muted transition-colors hover:text-text-secondary"
         >
-          <AudioWaveform className="size-[20px]" strokeWidth={2} />
+          <BrandMark className="size-[20px]" strokeWidth={2} />
         </button>
       </div>
 

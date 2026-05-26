@@ -2,6 +2,7 @@
 
 import { Check, Moon, Sun } from "lucide-react";
 
+import { BrandMark } from "@/components/brand/brand-mark";
 import {
   BOOT_STEP_DEFINITIONS,
   type ApiWakeupPhase,
@@ -24,18 +25,10 @@ function formatElapsed(ms: number): string {
 function BootMark() {
   return (
     <div
-      className="flex size-9 items-center justify-center rounded-md border border-border bg-bg-card-subtle"
+      className="flex size-9 items-center justify-center rounded-md border border-border bg-bg-card-subtle text-text-secondary"
       aria-hidden
     >
-      <svg viewBox="0 0 24 24" className="size-5 text-text-secondary" fill="none">
-        <path
-          d="M5 18V8M12 18V5M19 18V11"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path d="M4 18h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
+      <BrandMark className="size-5" strokeWidth={1.75} />
     </div>
   );
 }
