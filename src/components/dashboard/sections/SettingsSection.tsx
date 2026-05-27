@@ -184,7 +184,7 @@ export function SettingsSection({ monitor }: SettingsSectionProps) {
     <div className="flex flex-col gap-2 pb-1">
       <div className="grid grid-cols-12 items-stretch gap-2">
         {/* Card 1 — Stream Replay */}
-        <DashboardPanel className="col-span-12 flex flex-col lg:col-span-3">
+        <DashboardPanel className="col-span-3 flex flex-col">
           <PanelHeader title="Stream Replay" subtitle="Dataset cursor & timing" />
           <div className="flex flex-1 flex-col p-3 pt-1">
             <ControlBlock label="Stream speed">
@@ -231,7 +231,7 @@ export function SettingsSection({ monitor }: SettingsSectionProps) {
         </DashboardPanel>
 
         {/* Card 2 — Scoring & Thresholds */}
-        <DashboardPanel className="col-span-12 flex flex-col lg:col-span-3">
+        <DashboardPanel className="col-span-3 flex flex-col">
           <PanelHeader title="Scoring & Thresholds" subtitle="Risk engine parameters" />
           <div className="flex flex-1 flex-col p-3 pt-0">
             <div className="mb-2 flex flex-wrap gap-1.5">
@@ -275,7 +275,7 @@ export function SettingsSection({ monitor }: SettingsSectionProps) {
         </DashboardPanel>
 
         {/* Card 3 — Anomaly Injection */}
-        <DashboardPanel className="col-span-12 flex flex-col lg:col-span-3">
+        <DashboardPanel className="col-span-3 flex flex-col">
           <PanelHeader title="Anomaly Injection" subtitle="Known failure samples" />
           <div className="flex flex-1 flex-col p-3 pt-0">
             <Button
@@ -323,7 +323,7 @@ export function SettingsSection({ monitor }: SettingsSectionProps) {
         </DashboardPanel>
 
         {/* Card 4 — Runtime Status */}
-        <DashboardPanel className="col-span-12 flex flex-col lg:col-span-3">
+        <DashboardPanel className="col-span-3 flex flex-col">
           <PanelHeader title="Runtime Status" subtitle="Live session state" />
           <div className="flex flex-1 flex-col p-3 pt-0">
             <div className="mb-2 flex flex-wrap gap-1.5">
@@ -375,7 +375,7 @@ export function SettingsSection({ monitor }: SettingsSectionProps) {
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-2 gap-2 border-t border-border pt-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-5 gap-2 border-t border-border pt-3">
             {[
               { label: "Speed", value: speedLabel },
               { label: "Chart window", value: `Last ${monitor.chartMaxPoints}` },

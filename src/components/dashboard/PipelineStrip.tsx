@@ -74,7 +74,7 @@ export function PipelineStrip({ className, activeIndex = 2 }: PipelineStripProps
 
   return (
     <section className={cn("pipeline-strip", className)}>
-      <div className="hidden w-full items-center sm:flex">
+      <div className="flex w-full items-center">
         {steps.map((step, index) => (
           <div key={step.label} className="flex min-w-0 flex-1 items-center">
             {index > 0 ? <StepSeparator /> : null}
@@ -85,21 +85,6 @@ export function PipelineStrip({ className, activeIndex = 2 }: PipelineStripProps
               active={index === active}
               className="w-full"
             />
-          </div>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-0 overflow-x-auto sm:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {steps.map((step, index) => (
-          <div key={step.label} className="flex shrink-0 items-center">
-            <PipelineStepPill
-              label={step.label}
-              sub={step.sub}
-              icon={step.icon}
-              active={index === active}
-              className="min-w-[11rem]"
-            />
-            {index < steps.length - 1 ? <StepSeparator /> : null}
           </div>
         ))}
       </div>

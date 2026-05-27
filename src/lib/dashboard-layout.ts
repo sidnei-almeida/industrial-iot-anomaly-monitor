@@ -1,3 +1,6 @@
+/** Minimum canvas width for desktop-grade layout (viewport meta + CSS min-width). */
+export const DESKTOP_CANVAS_MIN_WIDTH_PX = 1366;
+
 /** Shared shell dimensions — sidebar logo row height matches topbar */
 export const SIDEBAR_WIDTH_PX = 68;
 export const TOPBAR_HEIGHT_PX = 88;
@@ -15,7 +18,7 @@ export const DASHBOARD_PANEL_BODY_HEIGHT_MOBILE = 488;
 export const shellLayout = {
   sidebarWidthClass: "w-[68px]" as const,
   topbarHeightClass: "h-[88px]" as const,
-  mainOffset: "ml-[68px] pt-[88px] max-sm:pt-[148px]" as const,
+  mainOffset: "ml-[68px] pt-[88px]" as const,
   topbarLeft: "left-[68px]" as const,
 };
 

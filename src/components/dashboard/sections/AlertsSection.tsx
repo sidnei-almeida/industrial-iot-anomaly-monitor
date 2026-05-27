@@ -40,7 +40,7 @@ export function AlertsSection({ monitor }: AlertsSectionProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+      <div className="grid grid-cols-4 gap-2">
         {summary.map((s) => (
           <div
             key={s.label}

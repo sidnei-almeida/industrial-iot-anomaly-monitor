@@ -9,8 +9,7 @@ import { SensorTelemetry } from "@/components/dashboard/SensorTelemetry";
 import type { SecomMonitor } from "@/hooks/use-secom-monitor";
 import { cn } from "@/lib/utils";
 
-const CHART_ROW_LG = "lg:h-[612px] lg:max-h-[612px]";
-const CHART_ROW_MOBILE = "h-[540px] max-h-[540px]";
+const CHART_ROW = "h-[612px] max-h-[612px]";
 
 const RECENT_EVENT_LIMIT = 48;
 
@@ -38,27 +37,19 @@ export function MonitorDashboardView({ monitor, className }: MonitorDashboardVie
         />
       </div>
 
-      <div className={cn("grid shrink-0 grid-cols-12 gap-2", CHART_ROW_MOBILE, CHART_ROW_LG)}>
+      <div className={cn("grid shrink-0 grid-cols-12 gap-2", CHART_ROW)}>
         <LiveAnomalyChart
-          className={cn("col-span-12", CHART_ROW_MOBILE, CHART_ROW_LG, "lg:col-span-6")}
+          className={cn("col-span-6", CHART_ROW)}
           data={monitor.chartData}
         />
         <SensorTelemetry
-          className={cn(
-            "col-span-12 sm:col-span-6 lg:col-span-3",
-            CHART_ROW_MOBILE,
-            CHART_ROW_LG,
-          )}
+          className={cn("col-span-3", CHART_ROW)}
           sensors={monitor.currentPacket?.visibleSensors ?? []}
           processStatus={monitor.currentPacket?.processStatus}
           topContributingSensor={monitor.currentPacket?.topContributingSensor}
         />
         <ModelOutput
-          className={cn(
-            "col-span-12 sm:col-span-6 lg:col-span-3",
-            CHART_ROW_MOBILE,
-            CHART_ROW_LG,
-          )}
+          className={cn("col-span-3", CHART_ROW)}
           packet={monitor.currentPacket}
         />
       </div>

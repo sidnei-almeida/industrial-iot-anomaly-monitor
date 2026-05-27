@@ -17,7 +17,7 @@ const sensorIcons: Record<string, typeof Gauge> = {
   "vacuum-level": Gauge,
 };
 
-const BODY_CLASS = "flex h-[488px] flex-col lg:h-[560px]";
+const BODY_CLASS = "flex h-[560px] flex-col";
 
 interface SensorTelemetryProps {
   className?: string;
@@ -168,7 +168,7 @@ export function SensorTelemetry({
           <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
             Telemetry Summary
           </p>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-2.5 sm:grid-cols-4">
+          <div className="grid grid-cols-4 gap-x-3 gap-y-2.5">
             <SummaryStat
               label="Active"
               value={`${VISIBLE_SENSOR_MAP.length} / ${CSV_FEATURE_COUNT}`}

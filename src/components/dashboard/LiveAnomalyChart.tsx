@@ -159,7 +159,7 @@ export function LiveAnomalyChart({ className, data }: LiveAnomalyChartProps) {
           </select>
         }
       />
-      <div className="relative h-[460px] px-3 py-3 lg:h-[532px]">
+      <div className="relative h-[532px] px-3 py-3">
         {data.length === 0 ? (
           <div className="grid h-full place-items-center text-xs text-text-muted">
             Start stream to populate live chart

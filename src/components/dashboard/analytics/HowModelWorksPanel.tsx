@@ -92,7 +92,7 @@ function ExplanationBlock({
 function DecisionLogicSummary() {
   return (
     <div className="border-t border-border bg-bg-card-subtle px-3 py-2.5">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <p className="text-[9px] font-semibold uppercase tracking-wide text-text-muted">
             Decision logic
@@ -150,7 +150,7 @@ export function HowModelWorksPanel({ className }: { className?: string }) {
       <ModelFlowStrip />
 
       <div className="flex min-h-0 flex-1 flex-col gap-2 p-3">
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className="grid min-h-0 flex-1 grid-cols-3 gap-2">
           {EXPLANATION_BLOCKS.map((block) => (
             <ExplanationBlock
               key={block.title}

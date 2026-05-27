@@ -50,7 +50,7 @@ export function AppShell() {
     monitor.currentPacket?.processStatus !== "Warning";
 
   return (
-    <div className="min-h-screen bg-bg-page text-text-primary">
+    <div className="dashboard-desktop-canvas min-h-screen bg-bg-page text-text-primary">
 
       <Sidebar activeSection={activeSection} onNavigate={setActiveSection} />
 

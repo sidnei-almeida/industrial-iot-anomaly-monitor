@@ -78,7 +78,7 @@ export function KpiCards({
   ];
 
   return (
-    <section className={cn("grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6", className)}>
+    <section className={cn("grid grid-cols-6 gap-4", className)}>
       {cards.map((card) => (
         <div key={card.title} className="lux-card p-6">
           <div className="flex items-start justify-between gap-3">

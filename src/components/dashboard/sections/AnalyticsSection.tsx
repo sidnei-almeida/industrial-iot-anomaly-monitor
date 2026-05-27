@@ -144,7 +144,7 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
   return (
     <div className="flex flex-col gap-2 pb-1">
       {/* Row 1 — dataset KPIs */}
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-6 gap-2">
         <StatCard label="Total samples" value={a.totalSamples.toLocaleString()} />
         <StatCard label="Sensor features" value={String(a.featureCount)} />
         <StatCard
@@ -168,13 +168,13 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
       {/* Row 2 — distribution + quality (equal-height row) */}
       <div className="grid grid-cols-12 items-stretch gap-2">
         <ClassDistributionPanel
-          className="col-span-12 lg:col-span-5"
+          className="col-span-5"
           normalSamples={a.normalSamples}
           failureSamples={a.failureSamples}
           failureRate={a.failureRate}
         />
 
-        <DashboardPanel className="col-span-12 flex min-h-[340px] flex-col lg:col-span-4">
+        <DashboardPanel className="col-span-4 flex min-h-[340px] flex-col">
           <PanelHeader title="Dataset quality" subtitle={DATA_SOURCE_LABEL} />
           <div className="flex flex-1 flex-col justify-between p-3">
             <div>
@@ -195,7 +195,7 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
           </div>
         </DashboardPanel>
 
-        <DashboardPanel className="col-span-12 flex min-h-[340px] flex-col lg:col-span-3">
+        <DashboardPanel className="col-span-3 flex min-h-[340px] flex-col">
           <PanelHeader title="Failure pattern" subtitle="Ground-truth summary" />
           <div className="flex flex-1 flex-col gap-2 p-3 text-[11px]">
             <p className="text-text-secondary">
@@ -218,7 +218,7 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
 
       {/* Row 3 — model context */}
       <div className="grid grid-cols-12 items-stretch gap-2">
-        <DashboardPanel className="col-span-12 flex min-h-[380px] flex-col lg:col-span-4">
+        <DashboardPanel className="col-span-4 flex min-h-[380px] flex-col">
           <PanelHeader
             title="Model Overview"
             subtitle="Trained artifact · metadata only"
@@ -253,12 +253,12 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
           </div>
         </DashboardPanel>
 
-        <DashboardPanel className="col-span-12 flex min-h-[380px] flex-col lg:col-span-4">
+        <DashboardPanel className="col-span-4 flex min-h-[380px] flex-col">
           <PanelHeader title="How the Model Works" subtitle="Reconstruction-based detection" />
           <HowModelWorksPanel className="flex-1" />
         </DashboardPanel>
 
-        <DashboardPanel className="col-span-12 flex min-h-[380px] flex-col lg:col-span-4">
+        <DashboardPanel className="col-span-4 flex min-h-[380px] flex-col">
           <PanelHeader
             title="Inference Contract"
             subtitle={INFERENCE_CONTRACT.architectureNote}
@@ -289,7 +289,7 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
 
       {/* Row 4 — sensors + alignment */}
       <div className="grid grid-cols-12 items-stretch gap-2">
-        <DashboardPanel className="col-span-12 flex min-h-[260px] flex-col lg:col-span-4">
+        <DashboardPanel className="col-span-4 flex min-h-[260px] flex-col">
           <PanelHeader title="Visible sensor variance" subtitle="Columns 0–5 overview" />
           <div className="overflow-x-auto p-2">
             <table className="w-full text-left text-[10px]">
@@ -320,7 +320,7 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
           </div>
         </DashboardPanel>
 
-        <DashboardPanel className="col-span-12 flex min-h-[260px] flex-col lg:col-span-4">
+        <DashboardPanel className="col-span-4 flex min-h-[260px] flex-col">
           <PanelHeader title="Top unstable sensors" subtitle="Highest variance (cols 0–5)" />
           <div className="space-y-1.5 p-2">
             {a.topUnstableSensors.map((s, i) => (
@@ -339,7 +339,7 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
           </div>
         </DashboardPanel>
 
-        <DashboardPanel className="col-span-12 flex min-h-[260px] flex-col lg:col-span-4">
+        <DashboardPanel className="col-span-4 flex min-h-[260px] flex-col">
           <PanelHeader title="Dataset-to-Model Alignment" subtitle="Preprocessing bridge" />
           <div className="flex flex-1 flex-col justify-between p-3">
             <div>
@@ -375,7 +375,7 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
         <p className="mb-1.5 px-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-muted">
           Why Autoencoder for SECOM?
         </p>
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+        <div className="grid grid-cols-3 gap-2">
           <ValueCard
             title={AUTOENCODER_VALUE_CARDS[0].title}
             body={AUTOENCODER_VALUE_CARDS[0].body}

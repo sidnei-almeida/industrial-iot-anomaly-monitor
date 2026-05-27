@@ -82,10 +82,9 @@ export function Topbar({
         "fixed right-0 top-0 z-30 border-b border-border bg-bg-sidebar",
         shellLayout.topbarHeightClass,
         shellLayout.topbarLeft,
-        "max-sm:min-h-[88px] max-sm:h-auto",
       )}
     >
-      <div className="flex h-full items-center justify-between gap-6 px-5 sm:px-6">
+      <div className="flex h-full items-center justify-between gap-6 px-6">
         <div className="min-w-0 flex-1 py-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-[20px] font-semibold leading-tight tracking-tight text-text-primary lg:text-[21px]">
@@ -118,7 +117,7 @@ export function Topbar({
           ) : null}
         </div>
 
-        <div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
+        <div className="flex shrink-0 flex-col items-end gap-2">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 font-mono text-[12px] text-text-secondary">
               <Clock className="size-3.5 text-text-muted" strokeWidth={2} />
@@ -140,31 +139,6 @@ export function Topbar({
           </div>
           <StreamControls {...controlsProps} />
         </div>
-      </div>
-
-      <div className="flex flex-col gap-2 px-5 py-3 sm:hidden">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 font-mono text-[12px] text-text-secondary">
-            <Clock className="size-3.5 text-text-muted" />
-            <span className="tabular-nums">{formattedDate}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <HealthBadge systemHealthy={systemHealthy} />
-            <button
-              type="button"
-              aria-label={isLight ? "Switch to dark theme" : "Switch to light theme"}
-              onClick={() => toggle()}
-              className="flex size-7 items-center justify-center rounded-md text-text-muted transition-colors hover:text-text-secondary"
-            >
-              {isLight ? (
-                <Moon className="size-4" strokeWidth={2} />
-              ) : (
-                <Sun className="size-4" strokeWidth={2} />
-              )}
-            </button>
-          </div>
-        </div>
-        <StreamControls {...controlsProps} />
       </div>
     </header>
   );

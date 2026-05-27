@@ -1080,3 +1080,15 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Desktop dashboard canvas — preserve layout on narrow viewports / mobile browsers */
+html,
+body {
+  min-width: 1366px;
+  overflow-x: auto;
+}
+
+.dashboard-desktop-canvas,
+main {
+  min-width: 1366px;
+}
