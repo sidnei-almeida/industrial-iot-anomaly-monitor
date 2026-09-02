@@ -2,6 +2,23 @@ export const DEFAULT_API_THRESHOLD = 0.45;
 export const CONSERVATIVE_API_THRESHOLD = 0.5;
 export const DISPLAY_THRESHOLD = 60;
 export const WARNING_THRESHOLD = 50;
+
+/**
+ * Anchors for the 0-100 display scale.
+ *
+ * The autoencoder's reconstruction error never approaches 0 — over the replay
+ * dataset it runs from ~0.16 to ~1.8, clustered around 0.37 — so mapping it
+ * linearly from zero would waste the bottom of the scale and leave the median
+ * sample sitting on the warning line. Instead the scale is anchored on the
+ * observed distribution: the 5th percentile of the errors reads as 0, the model
+ * threshold reads as DISPLAY_THRESHOLD, and the 99th percentile reads as 100.
+ *
+ * Anomaly decisions still use the raw error against DEFAULT_API_THRESHOLD; this
+ * only controls how the score is presented. Re-derive with
+ * scripts/calibrate_display_scale.py if the model is retrained.
+ */
+export const DISPLAY_SCALE_MIN_ERROR = 0.3;
+export const DISPLAY_SCALE_MAX_ERROR = 0.75;
 export const CSV_FEATURE_COUNT = 590;
 export const MODEL_FEATURE_COUNT = 558;
 export const STREAM_INTERVAL_MS = 1000;

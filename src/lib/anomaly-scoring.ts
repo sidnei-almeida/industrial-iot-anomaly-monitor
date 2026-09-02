@@ -1,5 +1,7 @@
 import {
   DEFAULT_API_THRESHOLD,
+  DISPLAY_SCALE_MAX_ERROR,
+  DISPLAY_SCALE_MIN_ERROR,
   DISPLAY_THRESHOLD,
   RECOMMENDED_ACTIONS,
   VISIBLE_SENSOR_MAP,
@@ -32,19 +34,66 @@ export function getPrediction(score: number): PredictionLabel {
   return score >= DISPLAY_THRESHOLD ? "Anomaly" : "Normal";
 }
 
+/**
+ * Map a raw reconstruction error onto the 0-100 risk scale, in two linear
+ * segments that meet at the threshold:
+ *
+ *   DISPLAY_SCALE_MIN_ERROR .. threshold             ->   0 .. DISPLAY_THRESHOLD
+ *   threshold .. DISPLAY_SCALE_MAX_ERROR             ->  DISPLAY_THRESHOLD .. 100
+ *
+ * Anchoring the low end on the error the model actually produces for calm
+ * samples keeps the whole scale in use; the anomaly decision itself is still
+ * the raw error against the threshold.
+ */
 export function reconstructionErrorToDisplayScore(
   reconstructionError: number,
   apiThreshold = DEFAULT_API_THRESHOLD,
 ): number {
   if (!Number.isFinite(reconstructionError) || apiThreshold <= 0) return 0;
-  return Math.min(100, Math.round((reconstructionError / apiThreshold) * DISPLAY_THRESHOLD));
+
+  if (reconstructionError <= apiThreshold) {
+    const span = apiThreshold - DISPLAY_SCALE_MIN_ERROR;
+    // A threshold below the low anchor makes the calibration meaningless; fall
+    // back to a plain ratio so a custom threshold still produces a usable score.
+    if (span <= 0) {
+      return clamp(Math.round((reconstructionError / apiThreshold) * DISPLAY_THRESHOLD), 0, 100);
+    }
+    return clamp(
+      Math.round((DISPLAY_THRESHOLD * (reconstructionError - DISPLAY_SCALE_MIN_ERROR)) / span),
+      0,
+      DISPLAY_THRESHOLD,
+    );
+  }
+
+  const span = DISPLAY_SCALE_MAX_ERROR - apiThreshold;
+  if (span <= 0) {
+    return clamp(Math.round((reconstructionError / apiThreshold) * DISPLAY_THRESHOLD), 0, 100);
+  }
+  return clamp(
+    Math.round(
+      DISPLAY_THRESHOLD + ((100 - DISPLAY_THRESHOLD) * (reconstructionError - apiThreshold)) / span,
+    ),
+    DISPLAY_THRESHOLD,
+    100,
+  );
 }
 
+/** Inverse of the mapping above, so local scoring can report a plausible error. */
 export function displayScoreToSyntheticReconstructionError(
   displayScore: number,
   apiThreshold = DEFAULT_API_THRESHOLD,
 ): number {
-  return (displayScore / DISPLAY_THRESHOLD) * apiThreshold;
+  if (displayScore <= DISPLAY_THRESHOLD) {
+    const span = apiThreshold - DISPLAY_SCALE_MIN_ERROR;
+    if (span <= 0) return (displayScore / DISPLAY_THRESHOLD) * apiThreshold;
+    return DISPLAY_SCALE_MIN_ERROR + (displayScore / DISPLAY_THRESHOLD) * span;
+  }
+
+  const span = DISPLAY_SCALE_MAX_ERROR - apiThreshold;
+  if (span <= 0) return (displayScore / DISPLAY_THRESHOLD) * apiThreshold;
+  return (
+    apiThreshold + ((displayScore - DISPLAY_THRESHOLD) / (100 - DISPLAY_THRESHOLD)) * span
+  );
 }
 
 export interface ScoreResult {
