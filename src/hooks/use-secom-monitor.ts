@@ -10,6 +10,7 @@ import {
   DATASET_PATH,
   DISPLAY_THRESHOLD,
   EVENT_LOG_MAX_ENTRIES,
+  REPLAY_START_ROW,
 } from "@/lib/constants";
 import { getFeatureAdapterStatus } from "@/lib/feature-adapter";
 import { getFailureRowIndices, loadSecomDataset } from "@/lib/secom-data";
@@ -75,7 +76,7 @@ export function useSecomMonitor() {
   );
   const [useApi, setUseApi] = useState(SECOM_API_MODE_ENABLED);
   const [packetCounter, setPacketCounter] = useState(0);
-  const [cursorIndex, setCursorIndex] = useState(0);
+  const [cursorIndex, setCursorIndex] = useState(REPLAY_START_ROW);
   const [currentPacket, setCurrentPacket] = useState<StreamPacket | null>(null);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [events, setEvents] = useState<EventLogEntry[]>([]);
@@ -95,7 +96,7 @@ export function useSecomMonitor() {
 
   const rowsRef = useRef<SecomRow[]>([]);
   const failureIndicesRef = useRef<number[]>([]);
-  const cursorRef = useRef(0);
+  const cursorRef = useRef(REPLAY_START_ROW);
   const packetCounterRef = useRef(0);
   const streamStatusRef = useRef<StreamStatus>("idle");
   const apiStatusRef = useRef<ApiStatus>(SECOM_API_MODE_ENABLED ? "checking" : "disabled");
@@ -108,6 +109,8 @@ export function useSecomMonitor() {
   const loopDatasetRef = useRef(false);
   const autoInjectRef = useRef(false);
   const packetsSinceInjectRef = useRef(0);
+  const autoStartedRef = useRef(false);
+  const pausedByVisibilityRef = useRef(false);
 
   const pushEvent = useCallback(
     (message: string, level: EventLogEntry["level"] = "info", packetId?: number) => {
@@ -315,6 +318,7 @@ export function useSecomMonitor() {
     }
     setStreamStatus("running");
     streamStatusRef.current = "running";
+    pausedByVisibilityRef.current = false;
     const hz = (1000 / streamIntervalRef.current).toFixed(1);
     pushEvent(`Stream started — replaying SECOM samples at ${hz} Hz`, "system");
     void tick();
@@ -323,17 +327,19 @@ export function useSecomMonitor() {
   const pauseStream = useCallback(() => {
     setStreamStatus("paused");
     streamStatusRef.current = "paused";
+    pausedByVisibilityRef.current = false;
     pushEvent("Stream paused", "system");
   }, [pushEvent]);
 
   const resetStream = useCallback(() => {
     setStreamStatus("idle");
     streamStatusRef.current = "idle";
-    cursorRef.current = 0;
+    pausedByVisibilityRef.current = false;
+    cursorRef.current = REPLAY_START_ROW;
     packetCounterRef.current = 0;
     injectPendingRef.current = null;
     simulatedClockRef.current = new Date();
-    setCursorIndex(0);
+    setCursorIndex(REPLAY_START_ROW);
     setPacketCounter(0);
     setCurrentPacket(null);
     setChartData([]);
@@ -341,8 +347,48 @@ export function useSecomMonitor() {
     packetsSinceInjectRef.current = 0;
     setLastResetAt(new Date());
     setLastInjectedPacketId(null);
-    pushEvent("Simulation reset — cursor returned to row 0", "system");
+    pushEvent(`Simulation reset — cursor returned to row ${REPLAY_START_ROW}`, "system");
   }, [pushEvent]);
+
+  /**
+   * The dashboard presents itself as a live monitoring console, so it starts
+   * streaming as soon as the dataset is ready rather than opening on an empty
+   * chart. Only once: a reset returns control to the operator.
+   */
+  useEffect(() => {
+    if (autoStartedRef.current) return;
+    if (!meta.loaded) return;
+    if (streamStatusRef.current !== "idle") return;
+    autoStartedRef.current = true;
+    startStream();
+  }, [meta.loaded, startStream]);
+
+  /**
+   * Pause while the tab is in the background — nobody is watching, and every
+   * tick is an inference request. Resume only if we were the ones who paused,
+   * so returning to the tab never overrides an explicit pause.
+   */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        if (streamStatusRef.current === "running") {
+          pausedByVisibilityRef.current = true;
+          setStreamStatus("paused");
+          streamStatusRef.current = "paused";
+        }
+        return;
+      }
+
+      if (pausedByVisibilityRef.current && streamStatusRef.current === "paused") {
+        pausedByVisibilityRef.current = false;
+        setStreamStatus("running");
+        streamStatusRef.current = "running";
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   const injectAnomaly = useCallback(() => {
     const failureRow = pickFailureRow(rowsRef.current, failureIndicesRef.current);

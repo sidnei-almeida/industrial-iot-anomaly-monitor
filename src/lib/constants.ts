@@ -26,6 +26,21 @@ export const CHART_MAX_POINTS = 60;
 export const EVENT_LOG_MAX_ENTRIES = 50;
 export const DATASET_PATH = "/data/secom_cleaned_dataset.csv";
 
+/**
+ * Row the replay starts from.
+ *
+ * The dataset opens on an unusually noisy stretch: 41% of the first 90 rows sit
+ * above the model threshold, against 12.3% across the whole dataset. Since the
+ * stream starts on its own, that would make the first thing a visitor sees the
+ * least representative part of the data.
+ *
+ * Row 136 opens on a window whose anomaly rate (13.3%) is close to the dataset
+ * average, with the first anomaly landing about 7 packets in — long enough to
+ * establish a calm baseline, short enough that the detection is visible early.
+ * The replay still walks through the whole dataset from there.
+ */
+export const REPLAY_START_ROW = 136;
+
 export const DATASET_DISPLAY_NAME = "SECOM Cleaned Dataset";
 export const STREAM_MODE_DISPLAY = "Dataset Replay";
 
