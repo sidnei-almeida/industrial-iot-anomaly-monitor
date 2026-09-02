@@ -918,14 +918,15 @@
     background: var(--pipeline-pill-hover-bg);
   }
 
+  /* Active stage: a hairline gold border, no fill and no accent bar, so the
+     pill keeps the same geometry as its neighbours and nothing shifts. */
   .pipeline-pill-active {
-    border-left: 2px solid var(--gold);
-    background: var(--gold-subtle);
+    border-color: var(--gold-border);
   }
 
   .pipeline-pill-active:hover {
-    border-color: var(--hover-border);
-    background: var(--gold-subtle);
+    border-color: var(--gold-border);
+    background: var(--pipeline-pill-hover-bg);
   }
 
   .table-row-hover:hover {
