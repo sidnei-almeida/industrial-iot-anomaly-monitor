@@ -53,7 +53,13 @@ function PipelineStepPill({
         className,
       )}
     >
-      <Icon className="mt-0.5 size-3.5 shrink-0 text-text-secondary" aria-hidden />
+      <Icon
+        className={cn(
+          "mt-0.5 size-3.5 shrink-0",
+          active ? "text-accent-gold" : "text-text-secondary",
+        )}
+        aria-hidden
+      />
       <div className="min-w-0 flex-1">
         <p
           className={cn(
