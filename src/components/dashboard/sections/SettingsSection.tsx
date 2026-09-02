@@ -268,7 +268,7 @@ export function SettingsSection({ monitor }: SettingsSectionProps) {
               <p className="mt-2 text-[10px] leading-snug text-text-muted">
                 API scoring is disabled. Enable{" "}
                 <span className="font-mono text-text-muted">NEXT_PUBLIC_USE_SECOM_API</span>{" "}
-                for optional FastAPI inference.
+                for autoencoder inference.
               </p>
             )}
           </div>

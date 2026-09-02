@@ -42,3 +42,7 @@ next-env.d.ts
 CLAUDE.md
 AGENTS.md
 images/cd24ec28-ff24-4e54-b26d-857cf757be0e.png
+
+# python tooling (scripts/)
+__pycache__/
+*.pyc

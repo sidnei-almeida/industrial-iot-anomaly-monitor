@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Real-Time Industrial Anomaly Monitor",
     description:
-      "SECOM replay · live anomaly scoring · FastAPI autoencoder on Hugging Face.",
+      "SECOM replay · live anomaly scoring · autoencoder inference on Vercel.",
     images: ["/brand/og.svg"],
   },
   twitter: {

@@ -247,8 +247,8 @@ export function AnalyticsSection({ monitor }: AnalyticsSectionProps) {
               View model in reference repo →
             </a>
             <p className="mt-auto pt-2 text-[9px] leading-snug text-text-muted">
-              Weights are not executed in the browser. Scoring uses FastAPI when enabled, otherwise
-              local scoring during dataset replay.
+              Weights are not executed in the browser. Scoring runs in the Next.js inference route
+              when enabled, otherwise local scoring during dataset replay.
             </p>
           </div>
         </DashboardPanel>

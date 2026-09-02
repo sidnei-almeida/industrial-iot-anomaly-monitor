@@ -5,16 +5,14 @@
 <h1 align="center">Real-Time Industrial Anomaly Monitor</h1>
 
 <p align="center">
-  <strong>Next.js · TypeScript · Tailwind · Recharts · FastAPI Autoencoder</strong><br />
+  <strong>Next.js · TypeScript · Tailwind · Recharts · Autoencoder inference on Vercel</strong><br />
   <em>Production-style dashboard that replays SECOM manufacturing data as a live IoT stream and scores anomalies in real time.</em>
 </p>
 
 <p align="center">
   <a href="https://github.com/sidnei-almeida/industrial-iot-anomaly-monitor"><strong>View on GitHub</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/sidnei-almeida/secom_failure_prediction">Inference API (FastAPI)</a>
-  &nbsp;·&nbsp;
-  <a href="https://salmeida-secom-production-anomaly.hf.space/health">API health</a>
+  <a href="https://github.com/sidnei-almeida/secom_failure_prediction">Model training repo</a>
 </p>
 
 <p align="center">
@@ -23,7 +21,7 @@
   <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Recharts-3-E6522C?logo=apache&logoColor=white" alt="Recharts" />
-  <img src="https://img.shields.io/badge/FastAPI-HuggingFace-FFD21E?logo=fastapi&logoColor=black" alt="FastAPI on Hugging Face" />
+  <img src="https://img.shields.io/badge/Inference-Route%20Handler-000000?logo=vercel&logoColor=white" alt="Inference in Next.js route handlers" />
   <img src="https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel&logoColor=white" alt="Vercel" />
 </p>
 
@@ -33,11 +31,11 @@
 
 A **minimalist industrial monitoring dashboard** for semiconductor manufacturing anomaly detection. It replays the cleaned **SECOM** dataset (`secom_cleaned_dataset.csv`) as a **simulated real-time IoT sensor stream**—one manufacturing row per second—and visualizes live risk scores, process status, model output, sensor telemetry, and operational events.
 
-Inference runs through a **Neural Network Autoencoder** exposed as a **FastAPI** service on [Hugging Face Spaces](https://salmeida-secom-production-anomaly.hf.space). The UI waits for the API to wake up before entering the dashboard, so cold starts on free hosting do not surface a broken experience.
+Inference runs through a **Neural Network Autoencoder** that executes **inside this deployment**. The trained Keras weights are exported to a compact float32 buffer and evaluated by a pure-TypeScript forward pass in a Next.js route handler (`/api/predict`), so the dashboard has no external inference dependency: no Python service, no cold-start Space, nothing to keep awake. The UI still waits for `/api/health` before entering the dashboard.
 
-> **This is not a live factory PLCs integration.** Data is historical SECOM samples replayed with honest labeling: *Dataset Replay*, *Local Scoring*, and *FastAPI Autoencoder* when the API is online.
+> **This is not a live factory PLCs integration.** Data is historical SECOM samples replayed with honest labeling: *Dataset Replay*, *Local Scoring*, and *Autoencoder API* for real model output.
 
-> **Production API (default):** `https://salmeida-secom-production-anomaly.hf.space` — model training, Docker image, and training assets live in [secom_failure_prediction](https://github.com/sidnei-almeida/secom_failure_prediction).
+> **Model provenance:** training code, the Keras model, and the scaler parameters live in [secom_failure_prediction](https://github.com/sidnei-almeida/secom_failure_prediction). `scripts/export_model_weights.py` converts them into `src/lib/model/weights.ts`.
 
 ---
 
@@ -57,8 +55,8 @@ flowchart LR
   CSV[SECOM CSV in /public/data]
   BOOT[Boot screen]
   STREAM[Dataset replay 1 Hz]
-  ADAPT[Feature adapter 590→558]
-  API[FastAPI /predict]
+  ADAPT[Feature adapter 590→558 raw units]
+  API[Route handler /api/predict]
   LOCAL[Local scoring]
   UI[Dashboard UI]
 
@@ -80,7 +78,7 @@ flowchart LR
 
 - Full-screen **boot screen** polls `GET /health` every ~2.5s until HTTP **200**
 - Step list: shell → dataset metadata → wake inference → verify health → prepare stream
-- Calm messaging after ~20s for Hugging Face cold start; **Retry now** + link to health URL
+- Calm messaging after ~20s if the inference route is slow to start; **Retry now** + link to health URL
 - Dashboard **does not render** until the API responds (no broken empty state on deploy)
 
 ### Live operations dashboard
@@ -114,7 +112,7 @@ flowchart LR
 | **SECOM Cleaned Dataset** | Static CSV replay source (`public/data/secom_cleaned_dataset.csv`) |
 | **Dataset Replay** | One row per tick as a simulated IoT packet |
 | **Local Scoring** | Heuristic score from pass/fail context when API is off or after API error on a packet |
-| **FastAPI Autoencoder** | Live `reconstruction_error` + `is_anomaly` from `/predict` |
+| **Autoencoder API** | Live `reconstruction_error` + `is_anomaly` from `/api/predict` |
 
 When API mode is enabled and a request fails mid-stream, scoring falls back to local rules for that packet; the UI still shows **Local** (amber badge), not a separate “fallback” product mode.
 
@@ -144,12 +142,17 @@ Tokens: `src/app/globals.css` · chart colors: `src/lib/monitor-theme.ts`
 | Rows | 1,567 manufacturing samples |
 | CSV columns | `Time` + sensors `0`–`589` (590) + `Pass/Fail` |
 | Pass/Fail | `-1` = Normal · `1` = Failure |
-| Model input | **558** features (after cleaning; first 558 CSV columns via adapter) |
-| Default API threshold | `0.45` reconstruction error |
+| Model input | **558** features — CSV columns with ≤20% missing values in the original SECOM release, rescaled from the CSV's `[0,1]` normalization back to raw sensor units |
+| Default threshold | `0.45` reconstruction error |
 | Display alert line | **60** on 0–100 risk scale |
 | Warning band | 50–59 |
+| Display scale anchors | error `0.30` → 0 · `0.45` → 60 · `0.75` → 100 |
 
-Autoencoder architecture (API): 558 → 128 → 64 → 32 (bottleneck) → 64 → 128 → 558 — trained on normal samples; anomaly = high reconstruction error (MAE).
+Autoencoder architecture: 558 → 128 → 64 → 32 (bottleneck) → 64 → 128 → 558 — trained on normal samples; anomaly = high reconstruction error (MAE).
+
+**Display scale.** The reconstruction error never approaches 0 — over the replay dataset it runs from ~0.16 to ~1.8, clustered around 0.37 — so mapping it linearly from zero would waste the bottom of the 0–100 scale and park the median sample on the warning line. The score is anchored on the observed distribution instead: p5 of the errors reads as 0, the threshold reads as 60, p99 reads as 100. Anomaly decisions still compare the raw error against `0.45`, and the UI shows both numbers side by side. Re-derive the anchors with `scripts/calibrate_display_scale.py` if the model is retrained.
+
+The replay CSV keeps all 590 columns, imputed and min-max normalized for the sensor gauges, while the model expects the 558 cleaned columns in raw units. `src/lib/feature-adapter.ts` bridges the two; `scripts/export_feature_space.py` derives the column selection and the per-column bounds from the original UCI SECOM release.
 
 ---
 
@@ -170,26 +173,24 @@ Autoencoder architecture (API): 558 → 128 → 64 → 32 (bottleneck) → 64 �
 
 ## Environment
 
-Copy `.env.example` to `.env.local`:
+No environment variables are required — the model ships with the app. To override defaults, create `.env.local`:
 
 ```env
-# Hugging Face Space — SECOM FastAPI autoencoder (default if unset)
-NEXT_PUBLIC_SECOM_API_URL=https://salmeida-secom-production-anomaly.hf.space
-
-# Live API scoring (default on; set false for local-only demo)
+# Model scoring (default on; set false for local-only demo)
 NEXT_PUBLIC_USE_SECOM_API=true
 
 # Optional: production site URL for Open Graph metadata
 # NEXT_PUBLIC_SITE_URL=https://your-app.vercel.app
 
-# Optional: local FastAPI during development
-# NEXT_PUBLIC_SECOM_API_URL=http://localhost:7860
+# Optional: point the dashboard at an external service that speaks the same
+# /health and /predict contract. Defaults to this app's own /api routes.
+# NEXT_PUBLIC_SECOM_API_URL=https://example.com
 ```
 
 | Variable | Purpose |
 |----------|---------|
-| `NEXT_PUBLIC_SECOM_API_URL` | Base URL for `/health` and `/predict` |
-| `NEXT_PUBLIC_USE_SECOM_API` | When not `false`, app uses API when online |
+| `NEXT_PUBLIC_SECOM_API_URL` | Base URL for `/health` and `/predict`. Defaults to `/api` (this deployment) |
+| `NEXT_PUBLIC_USE_SECOM_API` | When not `false`, app scores with the model; otherwise local scoring only |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for social preview metadata |
 
 ---
@@ -201,14 +202,12 @@ git clone https://github.com/sidnei-almeida/industrial-iot-anomaly-monitor.git
 cd industrial-iot-anomaly-monitor
 
 npm install
-cp .env.example .env.local   # adjust API URL if needed
-
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-> **Note:** On Hugging Face free tier, the first `/health` response may take **30–60 seconds** after sleep. The boot screen keeps polling and explains the delay.
+> **Note:** The first `/api/health` response decodes the model weights (~650 KB) and takes a few hundred milliseconds; every request after that reuses the decoded buffers. The boot screen polls until the route answers.
 
 ### Production build
 
@@ -230,10 +229,9 @@ npm run lint
 1. Import this repository on [Vercel](https://vercel.com).
 2. **Framework preset:** Next.js  
 3. **Root directory:** repository root (not a subfolder).
-4. **Environment variables:**
-   - `NEXT_PUBLIC_SECOM_API_URL` = `https://salmeida-secom-production-anomaly.hf.space`
-   - `NEXT_PUBLIC_USE_SECOM_API` = `true`
-   - `NEXT_PUBLIC_SITE_URL` = your production URL (recommended)
+4. **Environment variables:** none are required — inference ships with the app.
+   - `NEXT_PUBLIC_SITE_URL` = your production URL (recommended, for social previews)
+   - `NEXT_PUBLIC_USE_SECOM_API` = `false` to disable model scoring and run local scoring only
 5. Deploy.
 
 **Project icon / OG:** static assets in `public/brand/`; Next.js also generates `/icon`, `/apple-icon`, and `/opengraph-image` at build time.
@@ -270,9 +268,9 @@ industrial-iot-anomaly-monitor/
 
 | Endpoint | Method | Role |
 |----------|--------|------|
-| `/health` | GET | Boot gate + runtime status (`{"status":"ok"}`) |
-| `/predict` | POST | Autoencoder inference per sensor packet |
-| `/` | GET | API metadata (optional; not required by dashboard) |
+| `/api/health` | GET | Boot gate + runtime status (`{"status":"ok"}`) |
+| `/api/predict` | POST | Autoencoder inference per sensor packet (up to 32 samples) |
+| `/api/predict` | GET | Model metadata: threshold, test-set metrics, feature count |
 
 **`POST /predict` body (simplified):**
 
@@ -297,7 +295,7 @@ industrial-iot-anomaly-monitor/
 }
 ```
 
-Full service documentation: [secom_failure_prediction README](https://github.com/sidnei-almeida/secom_failure_prediction).
+Training details and the original Python service: [secom_failure_prediction README](https://github.com/sidnei-almeida/secom_failure_prediction).
 
 ---
 
@@ -308,7 +306,10 @@ Full service documentation: [secom_failure_prediction README](https://github.com
 | `src/lib/secom-data.ts` | Load & parse CSV |
 | `src/lib/secom-stream.ts` | Build stream packets; API vs local scoring |
 | `src/lib/secom-api.ts` | Health check + predict client |
-| `src/lib/feature-adapter.ts` | 590 → 558 feature mapping |
+| `src/app/api/predict/route.ts` | Inference endpoint (Node runtime) |
+| `src/lib/model/autoencoder.ts` | TypeScript forward pass + scaler |
+| `src/lib/model/weights.ts` | Generated weights (base64 float32) |
+| `src/lib/feature-adapter.ts` | 590 → 558 mapping + rescale to raw units |
 | `src/lib/anomaly-scoring.ts` | Display score, process status, local scoring |
 | `src/hooks/use-secom-monitor.ts` | Stream loop, events, chart buffer, controls |
 | `src/hooks/use-api-wakeup.ts` | Boot screen polling & step state |
@@ -319,7 +320,7 @@ Full service documentation: [secom_failure_prediction README](https://github.com
 
 | Project | Role |
 |---------|------|
-| [secom_failure_prediction](https://github.com/sidnei-almeida/secom_failure_prediction) | FastAPI autoencoder, model weights, Docker / Hugging Face Space |
+| [secom_failure_prediction](https://github.com/sidnei-almeida/secom_failure_prediction) | Model training, Keras weights, scaler parameters, original FastAPI service |
 | **This repo** | Next.js monitoring dashboard & SECOM replay UI |
 
 ---

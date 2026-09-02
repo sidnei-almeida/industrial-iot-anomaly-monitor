@@ -132,7 +132,7 @@ export function useSecomMonitor() {
     setApiStatus(next);
     apiStatusRef.current = next;
     if (!healthy) {
-      pushEvent("FastAPI unavailable — switched to local scoring", "system");
+      pushEvent("Inference route unavailable — switched to local scoring", "system");
     } else {
       pushEvent("Autoencoder API connected", "system");
     }

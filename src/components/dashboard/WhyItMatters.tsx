@@ -24,7 +24,7 @@ const tiles = [
   {
     icon: Layers,
     title: "Scalable & Production Ready",
-    body: "Optional FastAPI scoring with local scoring when the inference service is offline.",
+    body: "Model inference runs in the deployment itself, with local scoring as a fallback.",
   },
 ];
 

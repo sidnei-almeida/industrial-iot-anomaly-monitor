@@ -164,13 +164,13 @@ export function BootScreen({
               rel="noopener noreferrer"
               className="text-text-muted underline-offset-2 transition-premium hover:text-text-secondary hover:underline"
             >
-              Check API status
+              Check inference status
             </a>
           </div>
 
           {showSlowMessage && !inferenceOnline ? (
             <p className="mt-3 text-[11px] leading-relaxed text-text-secondary">
-              The inference service is still waking up. This can take a moment on free hosting.
+              The inference route is still starting up. This can take a moment on a cold deployment.
             </p>
           ) : null}
 
