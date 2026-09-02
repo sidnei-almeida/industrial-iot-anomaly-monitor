@@ -7,7 +7,7 @@ export function getApiBaseUrl(): string {
   return getSecomApiBaseUrl();
 }
 
-/** Boot gate: HTTP 200 on /health (Hugging Face Space when awake). */
+/** Boot gate: HTTP 200 on /health once the route handler has decoded the model. */
 export async function pingApiHealth(timeoutMs = 5000): Promise<boolean> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);

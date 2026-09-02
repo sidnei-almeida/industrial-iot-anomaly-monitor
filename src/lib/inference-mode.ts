@@ -1,6 +1,6 @@
 import type { ApiStatus, ScoringSource } from "@/types/secom";
 
-/** Default on for Hugging Face demo; set NEXT_PUBLIC_USE_SECOM_API=false for local-only scoring. */
+/** Default on; set NEXT_PUBLIC_USE_SECOM_API=false to skip the inference route and score locally. */
 export const SECOM_API_MODE_ENABLED =
   process.env.NEXT_PUBLIC_USE_SECOM_API !== "false";
 
@@ -10,7 +10,7 @@ export const STREAM_MODE_LABEL = "Dataset Replay";
 export function getInferenceModeLabel(source: ScoringSource): string {
   switch (source) {
     case "api":
-      return "FastAPI Autoencoder";
+      return "Autoencoder API";
     case "api_fallback":
     case "local":
     default:
@@ -47,8 +47,8 @@ export function getFooterInferenceLabel(
   apiModeEnabled: boolean,
 ): string {
   if (!apiModeEnabled) return "Local Scoring";
-  if (source === "api") return "FastAPI Autoencoder";
+  if (source === "api") return "Autoencoder API";
   if (source === "api_fallback" || source === "local") return "Local Scoring";
-  if (apiStatus === "online") return "FastAPI (available)";
+  if (apiStatus === "online") return "Autoencoder API (available)";
   return "Local Scoring";
 }

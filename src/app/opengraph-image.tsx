@@ -65,7 +65,7 @@ export default function OpenGraphImage() {
             textAlign: "center",
           }}
         >
-          SECOM replay · live anomaly scoring · FastAPI autoencoder
+          SECOM replay · live anomaly scoring · autoencoder inference
         </div>
       </div>
     ),

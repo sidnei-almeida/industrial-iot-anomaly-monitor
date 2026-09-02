@@ -53,7 +53,7 @@ export function getDashboardModeSummary(
     return "Dataset Replay + Local Scoring";
   }
   if (apiModeEnabled && useApi && apiStatus === "online" && scoringSource === "api") {
-    return "Dataset Replay + FastAPI Autoencoder";
+    return "Dataset Replay + Autoencoder API";
   }
   return "Dataset Replay + Local Scoring";
 }

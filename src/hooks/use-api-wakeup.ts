@@ -21,7 +21,7 @@ export const BOOT_STEP_DEFINITIONS: ReadonlyArray<{
 }> = [
   { id: "shell", label: "Initializing dashboard shell" },
   { id: "dataset", label: "Loading SECOM dataset metadata" },
-  { id: "api-wake", label: "Waking FastAPI inference service" },
+  { id: "api-wake", label: "Starting autoencoder inference route" },
   { id: "health", label: "Verifying model health endpoint" },
   { id: "stream", label: "Preparing real-time stream" },
 ];
@@ -144,7 +144,7 @@ export function useApiWakeup() {
       patchStep("dataset", "completed");
 
       patchStep("api-wake", "active");
-      setStatusMessage("Waiting for Hugging Face inference service…");
+      setStatusMessage("Waiting for the inference route…");
       void pollHealth();
     };
 
@@ -170,7 +170,7 @@ export function useApiWakeup() {
 
   const retryNow = useCallback(() => {
     if (phaseRef.current === "ready") return;
-    setStatusMessage("Waiting for Hugging Face inference service…");
+    setStatusMessage("Waiting for the inference route…");
     pollNowRef.current?.();
   }, []);
 
